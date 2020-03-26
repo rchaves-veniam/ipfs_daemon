@@ -15,7 +15,10 @@ export IPFS_LOGGING=debug
 start() {
 	echo "Starting IPFS Daemon..."
 	cd /root/
-	/usr/bin/ipfs daemon --disable-transport-encryption &> /mnt/mmcblk0p1/ipfs/ipfs.log &
+	/usr/bin/ipfs config --json Experiments.PreferTLS true
+	# Remove ethernet from swarm options
+	/usr/bin/ipfs swarm filters add /ip4/192.168.21.0/ipcidr/24
+	/usr/bin/ipfs daemon &> /mnt/mmcblk0p1/ipfs/ipfs.log &
 	sleep 1
 	/usr/bin/ipfs log level all $IPFS_LOGGING
 	ln -s /mnt/mmcblk0p1/ipfs/ipfs.log /var/log/ipfs.log
@@ -31,4 +34,3 @@ restart() {
 	stop
 	start
 }
-
