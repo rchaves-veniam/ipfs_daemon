@@ -1,0 +1,40 @@
+#!/bin/sh /etc/rc.common
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+START=95
+export IPFS_PATH=/root/ipfs_path
+if [ ! -d $IPFS_PATH ]
+then
+	mkdir -p $IPFS_PATH
+	cd $IPFS_PATH
+	ipfs init
+	cp /root/swarm.key $IPFS_PATH
+fi
+
+export IPFS_LOGGING=debug
+
+start() {
+	#echo "Shutting down ethernet interface"
+	#ifconfig eth0 down
+	echo "Starting IPFS Daemon..."
+	cd /root/
+	#/usr/bin/ipfs daemon &> /dev/null &
+	/usr/bin/ipfs daemon &> /mnt/mmcblk0p1/ipfs/ipfs.log &
+	sleep 1
+	/usr/bin/ipfs log level all $IPFS_LOGGING
+	ln -s /mnt/mmcblk0p1/ipfs/ipfs.log /var/log/ipfs.log
+	cd -
+}
+
+stop() {
+	echo "Killing IPFS Daemon..."
+	#kill $(ps | grep 'ipfs daemon' | awk '{print $1}' | head -1)
+	ipfs shutdown
+	echo "Restoring ethernet interface"
+	ifconfig eth0 up
+}
+
+restart() {
+	stop
+	start
+}
+
