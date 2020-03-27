@@ -17,7 +17,7 @@ export IPFS_LOGGING=debug
 start() {
 	echo "Starting IPFS Daemon..."
 	cd /root/
-	/usr/bin/ipfs config --json Experiments.PreferTLS true
+	/usr/bin/ipfs config --json Experimental.PreferTLS true
 	# Remove ethernet from swarm options
 	/usr/bin/ipfs swarm filters add /ip4/192.168.21.0/ipcidr/24
 	# Remove bootstrap peers if any
