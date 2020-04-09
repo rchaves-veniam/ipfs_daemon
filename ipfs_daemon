@@ -1,7 +1,18 @@
 #!/bin/sh /etc/rc.common
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 START=95
-export IPFS_PATH=/tmp/ipfs_path
+if [ -n "$USE_TMP" ]
+then
+	export IPFS_PATH=/tmp/ipfs_path
+elif [ -n "$USE_SD" ]
+then
+	export IPFS_PATH=/mnt/mmcblk0p1/ipfs/go-ipfs/.ipfs
+else
+then
+	export IPFS_PATH=/root/ipfs_path
+fi
+
+export IPFS_PATH=/root/ipfs_path
 
 # If IPFS folder doesn't already exist, create one.
 if [ ! -d $IPFS_PATH ]
@@ -15,6 +26,11 @@ fi
 export IPFS_LOGGING=debug
 
 start() {
+	LOGPATH=/mnt/mmcblk0p1/ipfs/ipfs.log
+	if [ -n "$DOCKER" ]
+	then
+		LOGPATH=$IPFS_PATH/ipfs.log
+	fi
 	echo "Starting IPFS Daemon..."
 	cd /root/
 	/usr/bin/ipfs config --json Experimental.PreferTLS true
@@ -24,10 +40,10 @@ start() {
 	# Remove bootstrap peers if any
 	ipfs bootstrap rm --all
 	# Start IPFS daemon
-	/usr/bin/ipfs daemon &> /mnt/mmcblk0p1/ipfs/ipfs.log &
+	/usr/bin/ipfs daemon &> $LOGPATH &
 	sleep 1
 	/usr/bin/ipfs log level all $IPFS_LOGGING
-	ln -s /mnt/mmcblk0p1/ipfs/ipfs.log /var/log/ipfs.log
+	ln -s $LOGPATH /var/log/ipfs.log
 	cd -
 }
 
