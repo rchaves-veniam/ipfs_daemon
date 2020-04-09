@@ -8,7 +8,6 @@ elif [ -n "$USE_SD" ]
 then
 	export IPFS_PATH=/mnt/mmcblk0p1/ipfs/go-ipfs/.ipfs
 else
-then
 	export IPFS_PATH=/root/ipfs_path
 fi
 
