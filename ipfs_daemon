@@ -21,7 +21,7 @@ then
 	cp /root/swarm.key $IPFS_PATH
 fi
 
-export IPFS_LOGGING=debug
+#export IPFS_LOGGING=debug
 
 start() {
 	LOGPATH=/mnt/mmcblk0p1/ipfs/ipfs.log
@@ -40,7 +40,7 @@ start() {
 	# Start IPFS daemon
 	/usr/bin/ipfs daemon &> $LOGPATH &
 	sleep 1
-	/usr/bin/ipfs log level all $IPFS_LOGGING
+	#/usr/bin/ipfs log level all $IPFS_LOGGING
 	ln -s $LOGPATH /var/log/ipfs.log
 	cd -
 }
