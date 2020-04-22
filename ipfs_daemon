@@ -2,15 +2,15 @@
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 if [ -n "$USE_TMP" ]
 then
-	export IPFS_PATH=/tmp/ipfs_path
+	export IPFS_PATH=/tmp/.ipfs
 elif [ -n "$USE_SD" ]
 then
 	export IPFS_PATH=/mnt/mmcblk0p1/ipfs/go-ipfs/.ipfs
 else
-	export IPFS_PATH=/root/ipfs_path
+	export IPFS_PATH=/root/.ipfs
 fi
 
-export IPFS_PATH=/root/ipfs_path
+export IPFS_PATH=/root/.ipfs
 
 # If IPFS folder doesn't already exist, create one.
 if [ ! -d $IPFS_PATH ]
@@ -19,6 +19,7 @@ then
 	cd $IPFS_PATH
 	ipfs init
 	cp /root/swarm.key $IPFS_PATH
+	cd -
 fi
 
 #export IPFS_LOGGING=debug
@@ -30,6 +31,7 @@ start() {
 		LOGPATH=$IPFS_PATH/ipfs.log
 	fi
 	echo "Starting IPFS Daemon..."
+	echo "Logging to $LOGPATH"
 	cd /root/
 	/usr/bin/ipfs config --json Experimental.PreferTLS true
 	/usr/bin/ipfs config --json Discovery.MDNS.Interval 1
@@ -41,13 +43,14 @@ start() {
 	/usr/bin/ipfs daemon &> $LOGPATH &
 	sleep 1
 	#/usr/bin/ipfs log level all $IPFS_LOGGING
+	mkdir -p /var/log
 	ln -s $LOGPATH /var/log/ipfs.log
 	cd -
 }
 
 stop() {
 	echo "Killing IPFS Daemon..."
-	ipfs shutdown
+	/usr/bin/ipfs shutdown
 }
 
 restart() {
